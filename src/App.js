@@ -1,25 +1,51 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react'
+import Search from './Search'
+import Giphys from './Giphys'
+import { getAllGiphysBySearch } from './giphyAPI'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      userInput: '',
+      giphys: [],
+    }
+  }
+
+  handleSearchChange = (e) => {
+    // const textValue = e.target.value;
+    // console.log('search string ', textValue);
+    this.setState({userInput: e.target.value});
+  }
+
+  handleSubmit = (e) => {
+    console.log('search string entered: ' + this.state.searchString);
+
+    // get search result from external api
+    getAllGiphysBySearch(this.state.searchString)
+      .then((res) =>  {
+        console.log('gyphs', res);
+        this.setState({giphys:res.data.data});
+      })
+      .catch((error) => {
+        console.log("API Error: ", error);
+      })
+
+    e.preventDefault()
+  }
+
+  render() {
+    return (
+      <>
+        <h1>Giphy!</h1>
+        <Search 
+          searchString={this.state.searchString}
+          onSubmit={this.handleSubmit} 
+          onChange={this.handleSearchChange}/>
+        <Giphys giphys={this.state.giphys} />
+      </>
+    )
+  }
 }
-
-export default App;
